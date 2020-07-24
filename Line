@@ -1,0 +1,37 @@
+""" Creating subplots of efficiency varied reduced pressure for 3 temperature 
+    Efficiency data accessed from coulmns of spreadsheet
+    Data obtained from EES. Cycle: Supercritical Organic Rankine Cycle """
+
+import matplotlib.pyplot as plt
+import xlrd
+import numpy as np
+
+col = ['b', 'r-.', 'g--', 'k:']     # Color of working fluids
+line_labels = ["DME","R1234yf","DEE","Isobutane"]   # Working fluids
+xticks = [1,2,3,4]
+temp = ['T\u2085 = 400K', 'T\u2085 = 450K', 'T\u2085 = 500K']   #temperature
+
+# Functions to plot paramters against reduced pressure
+def graph_theta(x, y, greek):
+    fig, ax = plt.subplots(1, 3, sharey=True)           
+    ax[0].plot(x,y[0],col[0],x,y[1],col[1],x,y[2],col[2],x,y[3],col[3])
+    ax[1].plot(x,y[4],col[0],x,y[5],col[1],x,y[6],col[2],x,y[7],col[3])
+    ax[2].plot(x,y[8],col[0],x,y[9],col[1],x,y[10],col[2],x,y[11],col[3])
+    ax[0].set_ylabel(greek)
+    ax[0].legend(labels=line_labels,prop={'size': 10},loc=0)
+    plt.subplots_adjust(right=1.5, wspace=0.05)     # Reducing the white spaces
+    for i in range(0,len(ax)):
+        ax[i].set_xlabel('\u03B8 [-]')
+        ax[i].set_xticks(xticks)
+        ax[i].text(0.5, 0.01, temp[i], verticalalignment='bottom', 
+             horizontalalignment='center', transform=ax[i].transAxes, 
+             color='red', fontsize=15)      # Denoting the temperature of plot    
+
+eff_greek = '\u03B7 [%]'
+data = xlrd.open_workbook('C:\Data.xlsx')   # Accessing location of spreadsheet
+eff_sheet = data.sheet_by_name('Plot 1')    # Aceessing particular worksheet
+eta = np.zeros(shape=(12,((eff_sheet.nrows)-1)))    # Initializing matrix
+P_R = [eff_sheet.cell_value(r, 0) for r in range(1,eff_sheet.nrows)]
+for i in range(0, 12):
+    eta[i] = [eff_sheet.cell_value(r, i+1) for r in range(1,eff_sheet.nrows)]
+graph_theta(P_R, eta, eff_greek)    # Call the function to generate plot
